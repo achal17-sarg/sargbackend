@@ -17,7 +17,7 @@ public class CareerService {
     private EmailService emailService;
 
     // --- CREATE ---
-    public CareerApplication submitApplication(CareerApplication application, MultipartFile file) {
+    public CareerApplication submitApplication(CareerApplication application, MultipartFile file) throws Exception{
         // 1. Save the application data to the database
         CareerApplication savedApplication = repository.save(application);
 

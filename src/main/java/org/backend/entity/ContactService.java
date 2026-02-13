@@ -1,6 +1,4 @@
-package org.backend.service;
 
-import org.backend.entity.ContactForm;
 import org.backend.repository.ContactRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,9 +25,9 @@ public class ContactService {
     
     private void sendContactEmailToHR(ContactForm contact) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("hr@sargsoftech.com");
+        message.setFrom("achal.shinde@sargsoftech.com");
         message.setTo(hrEmail);
-        message.setSubject("New Enquiry Received  - " + contact.getBusiness_nm());
+        message.setSubject("New Contact Form - " + contact.getBusiness_nm());
         message.setText("New contact form submission:\n\n" +
                 "Name: " + contact.getName() + "\n" +
                 "Email: " + contact.getEmail() + "\n" +

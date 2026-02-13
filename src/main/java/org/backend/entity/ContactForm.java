@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Data
 @Table(name = "contact_forms")
@@ -19,14 +21,21 @@ public class ContactForm {
     private String email;
     
     @Column(nullable = false)
-    private String phone;
+    private String phoneno;
     
     @Column(nullable = false)
-    private String subject;
-    
+    private String business_nm;
+
     @Column(columnDefinition = "TEXT")
     private String message;
     
-    @Column(nullable = false)
-    private LocalDateTime submittedAt = LocalDateTime.now();
+   // Change this line in ContactForm.java
+   @JsonIgnore
+@Column(name = "submitted_at", nullable = false, updatable = false)
+private LocalDateTime submittedAt = LocalDateTime.now();
+@PrePersist
+    protected void onCreate() {
+        this.submittedAt = LocalDateTime.now();
+    }
 }
+

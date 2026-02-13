@@ -6,21 +6,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
-@RequestMapping("/api/contact")
-@CrossOrigin(origins = "*") // Allows connection from your React/Angular frontend
+@RequestMapping("sargweb/api/contact")
+@CrossOrigin(origins = "*") 
 public class ContactController {
 
     @Autowired
     private ContactService contactService;
 
     @PostMapping("/submit")
-    public ResponseEntity<String> submitForm(@RequestBody ContactForm contactForm) {
+    public ResponseEntity<Map<String, String>> submitForm(@RequestBody ContactForm contactForm) {
+        Map<String, String> response = new HashMap<>();
         try {
             contactService.submitContact(contactForm);
-            return ResponseEntity.ok("Contact request submitted successfully!");
+            
+            // Returning a Map ensures Spring Boot converts it to JSON: {"message": "..."}
+            response.put("status", "success");
+            response.put("message", "Contact request submitted successfully!");
+            return ResponseEntity.ok(response);
+            
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Failed to send request: " + e.getMessage());
+            response.put("status", "error");
+            response.put("message", "Failed to send request: " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
         }
     }
 }

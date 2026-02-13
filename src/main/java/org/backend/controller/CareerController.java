@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/career")
+@RequestMapping("/sargweb/api/career")
 @CrossOrigin(origins = "*")
 public class CareerController {
 
