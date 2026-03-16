@@ -11,10 +11,11 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("sargweb/api/journey")
+@RequestMapping("/api/journey")
 @CrossOrigin(origins = "*")
 public class JourneyController {
 
@@ -35,27 +36,82 @@ public class JourneyController {
 
     @PostMapping("/submit")
     public ResponseEntity<Map<String, String>> submitJourney(@RequestBody JourneyInquiry inquiry) {
+        Map<String, String> response = new HashMap<>();
         try {
             // 1️⃣ Save to Database
-            journeyRepository.save(inquiry);
+            System.out.println("Saving journey inquiry: " + inquiry.getFullName());
+            JourneyInquiry savedInquiry = journeyRepository.save(inquiry);
+            System.out.println("Journey inquiry saved with ID: " + savedInquiry.getId());
 
-            // 2️⃣ Send Emails
-            sendEmails(inquiry);
+            // 2️⃣ Send Emails (async - won't block response)
+            try {
+                sendEmails(inquiry);
+            } catch (Exception emailError) {
+                System.err.println("Email sending failed but data saved: " + emailError.getMessage());
+            }
 
-            Map<String, String> response = new HashMap<>();
             response.put("status", "success");
             response.put("message", "Consultation booked successfully! Our team will contact you.");
+            response.put("id", String.valueOf(savedInquiry.getId()));
 
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("status", "error");
-            errorResponse.put("message", "Request failed: " + e.getMessage());
-
-            return ResponseEntity.status(500).body(errorResponse);
+            e.printStackTrace();
+            response.put("status", "error");
+            response.put("message", "Request failed: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
         }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<JourneyInquiry>> getAllJourneyInquiries() {
+        List<JourneyInquiry> inquiries = journeyRepository.findAll();
+        return ResponseEntity.ok(inquiries);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getJourneyInquiryById(@PathVariable Long id) {
+        return journeyRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> deleteJourneyInquiry(@PathVariable Long id) {
+        Map<String, String> response = new HashMap<>();
+        try {
+            if (journeyRepository.existsById(id)) {
+                journeyRepository.deleteById(id);
+                response.put("status", "success");
+                response.put("message", "Journey inquiry deleted successfully");
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("status", "error");
+                response.put("message", "Journey inquiry not found");
+                return ResponseEntity.status(404).body(response);
+            }
+        } catch (Exception e) {
+            response.put("status", "error");
+            response.put("message", "Failed to delete: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<Map<String, Long>> getJourneyInquiryCount() {
+        Map<String, Long> response = new HashMap<>();
+        response.put("count", journeyRepository.count());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/test")
+    public ResponseEntity<Map<String, String>> testEndpoint() {
+        Map<String, String> response = new HashMap<>();
+        response.put("status", "working");
+        response.put("totalRecords", String.valueOf(journeyRepository.count()));
+        response.put("message", "Journey API is working fine");
+        return ResponseEntity.ok(response);
     }
 
     @Async

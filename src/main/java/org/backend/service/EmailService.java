@@ -68,8 +68,8 @@ public class EmailService {
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
         
         helper.setFrom(senderEmail);
-        helper.setTo(adminEmail); // Uses the admin email from your config
-        helper.setSubject(" Application for " + application.getPosition() + " - " + application.getFullName());
+        helper.setTo(adminEmail);
+        helper.setSubject("Application for " + application.getPosition() + " - " + application.getCandidateName());
         
         String emailBody = String.format(
             "Hello Admin,\n\nA new job application has been submitted.\n\n" +
@@ -81,7 +81,7 @@ public class EmailService {
             "Cover Letter:\n%s\n\n" +
             "Note: The candidate's resume is attached to this email.",
             application.getPosition(),
-            application.getFullName(),
+            application.getCandidateName(),
             application.getEmail(),
             application.getPhone(),
             application.getAppliedAt(),
@@ -115,7 +115,7 @@ public class EmailService {
             "We have received your application successfully and our team will review it shortly.\n\n" +
             "Best regards,\n" +
             "HR Team - %s",
-            application.getFullName(),
+            application.getCandidateName(),
             application.getPosition(),
             companyName,
             companyName
@@ -159,7 +159,7 @@ public void sendJourneyConfirmationToCustomer(JourneyInquiry inquiry) {
 public void sendDemoNotification(DemoRequest request) {
     SimpleMailMessage message = new SimpleMailMessage();
     message.setFrom("hr@sargsoftech.com"); 
-    message.setTo("info@sargsoftech.com"); // Your receiving email
+    message.setTo("test@sargsoftech.com"); // Your receiving email
     message.setSubject("New Demo Request: " + request.getProject());
     
     String content = "New Demo Request Details:\n" +

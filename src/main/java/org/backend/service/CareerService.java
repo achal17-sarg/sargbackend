@@ -18,8 +18,15 @@ public class CareerService {
 
     // --- CREATE ---
     public CareerApplication submitApplication(CareerApplication application, MultipartFile file) throws Exception{
+        System.out.println("=== Submitting Application ===");
+        System.out.println("Candidate Name: " + application.getCandidateName());
+        System.out.println("Email: " + application.getEmail());
+        System.out.println("Position: " + application.getPosition());
+        System.out.println("Job ID: " + application.getJobId());
+        
         // 1. Save the application data to the database
         CareerApplication savedApplication = repository.save(application);
+        System.out.println("Application saved with ID: " + savedApplication.getId());
 
         // 2. Trigger Emails after successful database save
         try {
@@ -53,13 +60,17 @@ public class CareerService {
         CareerApplication existing = getApplicationById(id);
         
         // Update fields
-        existing.setFullName(newDetails.getFullName());
+        existing.setCandidateName(newDetails.getCandidateName());
         existing.setEmail(newDetails.getEmail());
         existing.setPhone(newDetails.getPhone());
         existing.setPosition(newDetails.getPosition());
         existing.setCoverLetter(newDetails.getCoverLetter());
-        
-        // Logic for file update could go here if needed
+        if (newDetails.getJobId() != null) {
+            existing.setJobId(newDetails.getJobId());
+        }
+        if (newDetails.getStatus() != null) {
+            existing.setStatus(newDetails.getStatus());
+        }
         
         return repository.save(existing);
     }

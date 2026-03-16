@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/sargweb/api/career")
+@RequestMapping("/api/career")
 @CrossOrigin(origins = "*")
 public class CareerController {
 
@@ -20,14 +20,50 @@ public class CareerController {
     private CareerService careerService;
 
     // --- CREATE ---
-    @PostMapping(value = "/apply", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PostMapping(value = "/apply")
     public ResponseEntity<String> submitApplication(
-            @RequestPart("application") CareerApplication application,
-            @RequestPart("resume") MultipartFile file) {
+            @RequestParam(value = "fullName", required = false) String fullName,
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "phone", required = false) String phone,
+            @RequestParam(value = "position", required = false) String position,
+            @RequestParam(value = "coverLetter", required = false) String coverLetter,
+            @RequestParam(value = "jobId", required = false) Long jobId,
+            @RequestPart(value = "resume", required = false) MultipartFile file) {
         try {
+            System.out.println("=== Received Application ===");
+            System.out.println("fullName: " + fullName);
+            System.out.println("email: " + email);
+            System.out.println("phone: " + phone);
+            System.out.println("position: " + position);
+            System.out.println("coverLetter: " + coverLetter);
+            System.out.println("jobId: " + jobId);
+            System.out.println("file: " + (file != null ? file.getOriginalFilename() : "null"));
+            
+            if (fullName == null || fullName.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Full name is required");
+            }
+            if (email == null || email.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Email is required");
+            }
+            if (phone == null || phone.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Phone is required");
+            }
+            if (position == null || position.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Position is required");
+            }
+            
+            CareerApplication application = new CareerApplication();
+            application.setCandidateName(fullName);
+            application.setEmail(email);
+            application.setPhone(phone);
+            application.setPosition(position);
+            application.setCoverLetter(coverLetter);
+            application.setJobId(jobId);
+            
             careerService.submitApplication(application, file);
             return ResponseEntity.status(HttpStatus.CREATED).body("Application submitted successfully!");
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().body("Failed to submit: " + e.getMessage());
         }
     }

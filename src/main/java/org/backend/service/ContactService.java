@@ -8,6 +8,10 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class ContactService {
     
@@ -27,7 +31,7 @@ public class ContactService {
     
     private void sendContactEmailToHR(ContactForm contact) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("hr@sargsoftech.com");
+        message.setFrom("test@sargsoftech.com");
         message.setTo(hrEmail);
         message.setSubject("New Enquiry Received  - " + contact.getBusiness_nm());
         message.setText("New contact form submission:\n\n" +
@@ -37,5 +41,54 @@ public class ContactService {
                 "Business: " + contact.getBusiness_nm() + "\n" +
                 "Message: " + contact.getMessage());
         mailSender.send(message);
+    }
+    
+    public List<ContactForm> getAllContacts() {
+        return repository.findAll();
+    }
+    public List<ContactForm> getAllIncludingHidden() {
+    return repository.findAll();
+}
+public List<ContactForm> getNewEnquiries() {
+    // Use simple repository method
+    try {
+        return repository.findByStatusAndHiddenFalse("New");
+    } catch (Exception e) {
+        System.err.println("Repository query failed: " + e.getMessage());
+        // Fallback to manual filtering
+        return repository.findAll()
+                .stream()
+                .filter(form -> {
+                    Boolean hidden = form.getHidden();
+                    String status = form.getStatus();
+                    return (hidden == null || !hidden) && "New".equals(status);
+                })
+                .collect(Collectors.toList());
+    }
+}
+    
+    // Inside ContactService.java
+
+public List<ContactForm> getAllActiveContacts() {
+    // Use simple repository method
+    try {
+        return repository.findByHiddenFalse();
+    } catch (Exception e) {
+        System.err.println("Repository query failed: " + e.getMessage());
+        return repository.findAll()
+                .stream()
+                .filter(form -> {
+                    Boolean hidden = form.getHidden();
+                    return hidden == null || !hidden;
+                })
+                .collect(Collectors.toList());
+    }
+}
+    public void hideEnquiry(Long id) {
+        ContactForm enquiry = repository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Enquiry not found"));
+        
+        enquiry.setHidden(true);
+        repository.save(enquiry);
     }
 }

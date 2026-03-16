@@ -2,12 +2,16 @@ package org.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "contact_forms")
 public class ContactForm {
     @Id
@@ -28,14 +32,32 @@ public class ContactForm {
 
     @Column(columnDefinition = "TEXT")
     private String message;
+
+    @Column(name = "hidden", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean hidden = false; 
     
-   // Change this line in ContactForm.java
-   @JsonIgnore
-@Column(name = "submitted_at", nullable = false, updatable = false)
-private LocalDateTime submittedAt = LocalDateTime.now();
-@PrePersist
+    @Column(name = "status", nullable = false, columnDefinition = "VARCHAR(50) DEFAULT 'New'")
+    private String status = "New";
+    
+    @JsonIgnore
+    @Column(name = "submitted_at", nullable = false, updatable = false)
+    private LocalDateTime submittedAt;
+    
+    @PrePersist
     protected void onCreate() {
         this.submittedAt = LocalDateTime.now();
+        if (this.hidden == null) {
+            this.hidden = false;
+        }
+        if (this.status == null || this.status.isEmpty()) {
+            this.status = "New";
+        }
+    }
+    
+    @PreUpdate
+    protected void onUpdate() {
+        if (this.status == null || this.status.isEmpty()) {
+            this.status = "New";
+        }
     }
 }
-

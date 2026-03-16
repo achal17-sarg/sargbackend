@@ -1,5 +1,6 @@
 package org.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -12,8 +13,9 @@ public class CareerApplication {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(nullable = false)
-    private String fullName;
+    @Column(name = "full_name", nullable = false)
+    @JsonProperty("fullName")
+    private String candidateName;
     
     @Column(nullable = false)
     private String email;
@@ -27,8 +29,22 @@ public class CareerApplication {
     @Column(columnDefinition = "TEXT")
     private String coverLetter;
     
-    private String resumeFileName;
+    private String resume;
+    
+    @Column(name = "job_id")
+    private Long jobId;
     
     @Column(nullable = false)
-    private LocalDateTime appliedAt = LocalDateTime.now();
+    private String status = "Pending";
+    
+    @Column(nullable = false)
+    private LocalDateTime appliedAt;
+    
+    @PrePersist
+    protected void onCreate() {
+        this.appliedAt = LocalDateTime.now();
+        if (this.status == null || this.status.isEmpty()) {
+            this.status = "Pending";
+        }
+    }
 }
