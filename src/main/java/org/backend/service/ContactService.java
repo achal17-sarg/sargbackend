@@ -23,23 +23,51 @@ public class ContactService {
     
     @Value("${app.hr.email}")
     private String hrEmail;
+
+    @Value("${spring.mail.username}")
+    private String senderEmail;
+
+    @Value("${app.company.name:Sarg Softech}")
+    private String companyName;
     
     public void submitContact(ContactForm contactForm) {
         repository.save(contactForm);
-        sendContactEmailToHR(contactForm);
+        try {
+            sendContactEmailToHR(contactForm);
+            sendConfirmationToClient(contactForm);
+        } catch (Exception e) {
+            System.err.println("Email sending failed but data saved: " + e.getMessage());
+        }
     }
-    
+
     private void sendContactEmailToHR(ContactForm contact) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("test@sargsoftech.com");
-        message.setTo(hrEmail);
-        message.setSubject("New Enquiry Received  - " + contact.getBusiness_nm());
-        message.setText("New contact form submission:\n\n" +
-                "Name: " + contact.getName() + "\n" +
-                "Email: " + contact.getEmail() + "\n" +
-                "Phone: " + contact.getPhoneno() + "\n" +
-                "Business: " + contact.getBusiness_nm() + "\n" +
-                "Message: " + contact.getMessage());
+        message.setFrom(senderEmail);
+        message.setTo("hr@sargsoftech.com");
+        message.setSubject("New Enquiry Received - " + contact.getBusiness_nm());
+        message.setText(
+            "New contact form submission:\n\n" +
+            "Name: " + contact.getName() + "\n" +
+            "Email: " + contact.getEmail() + "\n" +
+            "Phone: " + contact.getPhoneno() + "\n" +
+            "Business: " + contact.getBusiness_nm() + "\n" +
+            "Message: " + contact.getMessage()
+        );
+        mailSender.send(message);
+    }
+
+    private void sendConfirmationToClient(ContactForm contact) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(senderEmail);
+        message.setTo(contact.getEmail());
+        message.setSubject("We Received Your Enquiry - " + companyName);
+        message.setText(
+            "Dear " + contact.getName() + ",\n\n" +
+            "Thank you for contacting " + companyName + ".\n\n" +
+            "We have received your enquiry and our team will get back to you shortly.\n\n" +
+            "Best Regards,\n" +
+            companyName + " Team"
+        );
         mailSender.send(message);
     }
     

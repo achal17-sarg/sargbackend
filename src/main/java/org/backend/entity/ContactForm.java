@@ -52,6 +52,9 @@ public class ContactForm {
         if (this.status == null || this.status.isEmpty()) {
             this.status = "New";
         }
+        if (this.business_nm == null) {
+            this.business_nm = "";
+        }
     }
     
     @PreUpdate

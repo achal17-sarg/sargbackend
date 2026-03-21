@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/sargweb/api/jobs")
-@CrossOrigin(origins = "*")
 public class JobPostController {
 
     @Autowired

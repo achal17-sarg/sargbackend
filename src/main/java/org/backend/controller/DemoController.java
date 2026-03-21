@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("sargweb/api/demo")
-@CrossOrigin(origins = "*")
 public class DemoController {
 
     @Autowired

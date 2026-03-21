@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("sargweb/api/contact")
-@CrossOrigin(origins = "*") 
 public class ContactController {
 
     @Autowired
@@ -29,16 +28,13 @@ public class ContactController {
         Map<String, String> response = new HashMap<>();
         try {
             contactService.submitContact(contactForm);
-            
-            // Returning a Map ensures Spring Boot converts it to JSON: {"message": "..."}
             response.put("status", "success");
             response.put("message", "Contact request submitted successfully!");
             return ResponseEntity.ok(response);
-            
         } catch (Exception e) {
             response.put("status", "error");
             response.put("message", "Failed to send request: " + e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.status(500).body(response);
         }
     }
     

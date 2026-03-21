@@ -12,7 +12,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("sargweb/api/debug")
-@CrossOrigin(origins = "*")
 public class DebugController {
 
     @Autowired

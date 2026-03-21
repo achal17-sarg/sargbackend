@@ -12,7 +12,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("sargweb/api/journey")
-@CrossOrigin(origins = "*")
 public class JourneyAdminController {
 
     @Autowired

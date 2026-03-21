@@ -19,6 +19,8 @@ public class JourneyInquiry {
     @Column(nullable = false)
     private String emailAddress;
 
+    private String mobileNumber;
+
     @Column(nullable = false)
     private String expertiseNeeded;
 

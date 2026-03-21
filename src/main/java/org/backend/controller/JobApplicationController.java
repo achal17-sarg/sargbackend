@@ -12,7 +12,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/sargweb/api/job-applications")
-@CrossOrigin(origins = "*")
 public class JobApplicationController {
 
     @Autowired

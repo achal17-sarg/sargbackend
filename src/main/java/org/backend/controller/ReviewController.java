@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/sargweb/api/reviews")
-@CrossOrigin(origins = "*")
 public class ReviewController {
 
     @Autowired
