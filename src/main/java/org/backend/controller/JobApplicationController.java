@@ -20,36 +20,29 @@ public class JobApplicationController {
     @GetMapping("/job/{jobId}")
     public ResponseEntity<?> getApplicationsByJobId(@PathVariable Long jobId) {
         try {
-            System.out.println("Fetching applications for job ID: " + jobId);
-            List<CareerApplication> applications = applicationRepository.findByJobId(jobId);
-            System.out.println("Found " + applications.size() + " applications");
+            List<CareerApplication> applications = applicationRepository.findByJobIdAndDeletedFalse(jobId);
             return ResponseEntity.ok(applications);
         } catch (Exception e) {
-            System.err.println("Error fetching applications: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<CareerApplication>> getAllApplications() {
-        System.out.println("=== Fetching all applications ===");
-        List<CareerApplication> applications = applicationRepository.findAll();
-        System.out.println("Total applications found: " + applications.size());
-        return ResponseEntity.ok(applications);
+        return ResponseEntity.ok(applicationRepository.findByDeletedFalse());
+    }
+
+    @GetMapping("/archived")
+    public ResponseEntity<List<CareerApplication>> getArchivedApplications() {
+        return ResponseEntity.ok(applicationRepository.findByDeletedTrue());
     }
 
     @GetMapping("/position/{position}")
     public ResponseEntity<?> getApplicationsByPosition(@PathVariable String position) {
         try {
-            String trimmedPosition = position.trim();
-            System.out.println("Fetching applications for position: '" + trimmedPosition + "'");
-            List<CareerApplication> applications = applicationRepository.findByPositionIgnoreCase(trimmedPosition);
-            System.out.println("Found " + applications.size() + " applications for position: " + trimmedPosition);
+            List<CareerApplication> applications = applicationRepository.findByPositionIgnoreCaseAndDeletedFalse(position.trim());
             return ResponseEntity.ok(applications);
         } catch (Exception e) {
-            System.err.println("Error fetching applications: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
@@ -86,22 +79,33 @@ public class JobApplicationController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> deleteApplication(@PathVariable Long id) {
         Map<String, String> response = new HashMap<>();
-        try {
-            if (applicationRepository.existsById(id)) {
-                applicationRepository.deleteById(id);
-                response.put("status", "success");
-                response.put("message", "Application deleted successfully");
-                return ResponseEntity.ok(response);
-            } else {
-                response.put("status", "error");
-                response.put("message", "Application not found");
-                return ResponseEntity.status(404).body(response);
-            }
-        } catch (Exception e) {
+        return applicationRepository.findById(id).map(app -> {
+            app.setDeleted(true);
+            applicationRepository.save(app);
+            response.put("status", "success");
+            response.put("message", "Application archived successfully");
+            return ResponseEntity.ok(response);
+        }).orElseGet(() -> {
             response.put("status", "error");
-            response.put("message", "Failed to delete: " + e.getMessage());
-            return ResponseEntity.status(500).body(response);
-        }
+            response.put("message", "Application not found");
+            return ResponseEntity.status(404).body(response);
+        });
+    }
+
+    @PutMapping("/{id}/restore")
+    public ResponseEntity<Map<String, String>> restoreApplication(@PathVariable Long id) {
+        Map<String, String> response = new HashMap<>();
+        return applicationRepository.findById(id).map(app -> {
+            app.setDeleted(false);
+            applicationRepository.save(app);
+            response.put("status", "success");
+            response.put("message", "Application restored successfully");
+            return ResponseEntity.ok(response);
+        }).orElseGet(() -> {
+            response.put("status", "error");
+            response.put("message", "Application not found");
+            return ResponseEntity.status(404).body(response);
+        });
     }
 
     @GetMapping("/count")

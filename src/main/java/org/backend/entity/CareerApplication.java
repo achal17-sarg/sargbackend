@@ -37,6 +37,9 @@ public class CareerApplication {
     @Column(nullable = false)
     private String status = "Pending";
     
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean deleted = false;
+    
     @Column(nullable = false)
     private LocalDateTime appliedAt;
     
@@ -45,6 +48,9 @@ public class CareerApplication {
         this.appliedAt = LocalDateTime.now();
         if (this.status == null || this.status.isEmpty()) {
             this.status = "Pending";
+        }
+        if (this.deleted == null) {
+            this.deleted = false;
         }
     }
 }

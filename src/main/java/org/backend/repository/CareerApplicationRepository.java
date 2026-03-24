@@ -10,4 +10,8 @@ import java.util.List;
 public interface CareerApplicationRepository extends JpaRepository<CareerApplication, Long> {
     List<CareerApplication> findByJobId(Long jobId);
     List<CareerApplication> findByPositionIgnoreCase(String position);
+    List<CareerApplication> findByDeletedFalse();
+    List<CareerApplication> findByDeletedTrue();
+    List<CareerApplication> findByJobIdAndDeletedFalse(Long jobId);
+    List<CareerApplication> findByPositionIgnoreCaseAndDeletedFalse(String position);
 }
