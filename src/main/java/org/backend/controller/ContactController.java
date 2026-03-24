@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("sargweb/api/contact")
+@RequestMapping("/sargweb/api/contact")
 public class ContactController {
 
     @Autowired

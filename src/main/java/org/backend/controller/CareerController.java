@@ -12,14 +12,14 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/career")
+@RequestMapping("/sargweb/api/career")
 public class CareerController {
 
     @Autowired
     private CareerService careerService;
 
     // --- CREATE ---
-    @PostMapping(value = "/apply")
+    @PostMapping(value = "/apply", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_FORM_URLENCODED_VALUE, "*/*" })
     public ResponseEntity<String> submitApplication(
             @RequestParam(value = "fullName", required = false) String fullName,
             @RequestParam(value = "email", required = false) String email,
@@ -27,7 +27,7 @@ public class CareerController {
             @RequestParam(value = "position", required = false) String position,
             @RequestParam(value = "coverLetter", required = false) String coverLetter,
             @RequestParam(value = "jobId", required = false) Long jobId,
-            @RequestPart(value = "resume", required = false) MultipartFile file) {
+            @RequestParam(value = "resume", required = false) MultipartFile file) {
         try {
             System.out.println("=== Received Application ===");
             System.out.println("fullName: " + fullName);

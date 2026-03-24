@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/testimonials")
+@RequestMapping("/sargweb/api/testimonials")
 public class TestimonialController {
 
     @Autowired
@@ -114,6 +114,6 @@ public class TestimonialController {
         Path filePath = Paths.get(uploadDir + fileName);
         Files.write(filePath, file.getBytes());
 
-        return "http://localhost:8090/uploads/logos/" + fileName;
+        return "/uploads/logos/" + fileName;
     }
 }

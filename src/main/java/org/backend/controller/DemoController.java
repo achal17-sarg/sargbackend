@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("sargweb/api/demo")
+@RequestMapping("/sargweb/api/demo")
 public class DemoController {
 
     @Autowired
